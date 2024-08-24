@@ -1,0 +1,54 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("POSTGRES_PRISMA_URL")
+    directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Post {
+    id          String    @id @default(cuid())
+    createdAt   DateTime  @default(now()) @map("created_at")
+    updatedAt   DateTime  @updatedAt @map("updated_at")
+    title       String
+    description String
+    imageUrl    String
+    content     String
+    status      Status
+    authorId    String
+    author      User?     @relation(fields: [authorId], references: [id])
+    comment     Comment[]
+
+    @@index([authorId])
+}
+
+model User {
+    id        String    @id @default(cuid())
+    createdAt DateTime  @default(now()) @map("created_at")
+    updatedAt DateTime  @updatedAt @map("updated_at")
+    name      String
+    email     String    @unique
+    password  String
+    posts     Post[]
+    comment   Comment[]
+}
+
+model Comment {
+    id        String   @id @default(cuid())
+    content   String
+    createdAt DateTime @default(now()) @map("created_at")
+    postId    String
+    authorId  String
+    post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+    author    User?    @relation(fields: [authorId], references: [id])
+
+    @@index([postId])
+    @@index([authorId])
+}
+
+enum Status {
+    draft
+    published
+}

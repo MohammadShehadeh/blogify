@@ -29,9 +29,6 @@ const config = {
       screens: {
         xs: '320px',
       },
-      fontFamily: {
-        sans: ['var(--font-geist-sans)'],
-      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

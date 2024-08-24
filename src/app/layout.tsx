@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-unresolved
-import { GeistSans } from 'geist/font/sans';
 import type { Metadata } from 'next';
+import NextTopLoader from 'nextjs-toploader';
 import React from 'react';
 
 import { Toaster } from '@/components/ui/toaster';
@@ -19,8 +19,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html className={cn('h-full min-h-full scroll-smooth antialiased', GeistSans.variable)} lang="en">
-      <body className="min-h-dvh" suppressHydrationWarning>
+    <html className={cn('h-full min-h-full scroll-smooth antialiased')} lang="en">
+      <body className="min-h-dvh">
+        <NextTopLoader color="#16a34a" showSpinner={false} shadow="none" />
         <main className="min-h-screen bg-muted/40">
           {children}
           <Toaster />

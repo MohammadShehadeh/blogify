@@ -17,9 +17,13 @@ const nextConfig = {
   poweredByHeader: false,
   skipTrailingSlashRedirect: true,
   trailingSlash: false,
-  transpilePackages: ['geist'],
   images: {
-    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
 };
 

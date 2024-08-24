@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { type PropsWithChildren } from 'react';
 
 import { logout } from '@/actions/auth';
 import { Icons } from '@/components/icons';
@@ -16,44 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useSession } from '@/providers/session-provider';
 
-const Navigation = ({ children }: PropsWithChildren) => {
-  return (
-    <div className="supports-backdrop-blur:bg-background/60 fixed left-0 right-0 top-0 z-20 border-b bg-background/95 px-4 backdrop-blur">
-      {children}
-    </div>
-  );
-};
-
-const NavigationContent = ({ children }: PropsWithChildren) => {
-  return <div className="flex h-14 items-center justify-between gap-2">{children}</div>;
-};
-
-const NavigationLogo = () => {
-  return (
-    <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tighter md:text-2xl">
-      <Icons.newspaper className="size-6" /> Blogify
-    </Link>
-  );
-};
-
-const NavigationAuth = () => {
-  return (
-    <nav className="flex items-center gap-1">
-      <Link className="text-sm font-medium text-foreground/80 transition-colors hover:text-foreground" href="/login/">
-        Login
-      </Link>
-      /
-      <Link
-        className="text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
-        href="/register/"
-      >
-        Register
-      </Link>
-    </nav>
-  );
-};
-
-const NavigationUser = () => {
+export const NavigationUser = () => {
   const session = useSession();
 
   return (
@@ -91,5 +53,3 @@ const NavigationUser = () => {
     </DropdownMenu>
   );
 };
-
-export { Navigation, NavigationContent, NavigationUser, NavigationAuth, NavigationLogo };

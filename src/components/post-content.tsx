@@ -1,14 +1,25 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import React from 'react';
 
 import { Byline } from '@/components/byline';
-import { Commenting } from '@/components/commenting';
 import { EditIndicator } from '@/components/edit-indicator';
+import { Icons } from '@/components/icons';
 import { LazyImage } from '@/components/lazy-image';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { getFormattedDate } from '@/lib/utils';
 import { usePost } from '@/providers/post-provider';
+
+const Commenting = dynamic(() => import('@/components/commenting').then((mod) => mod.Commenting), {
+  loading: () => (
+    <Button className="opacity-50" variant="outline" size="icon" aria-label="commenting">
+      <Icons.commenting className="size-5" />
+    </Button>
+  ),
+  ssr: false,
+});
 
 export const PostContent = () => {
   const { title, description, author, authorId, imageUrl, id, createdAt, content } = usePost();

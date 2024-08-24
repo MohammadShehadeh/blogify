@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Fragment } from 'react';
 
 import { Icons } from '@/components/icons';
@@ -28,7 +29,9 @@ export const Breadcrumbs = ({ items, className }: BreadcrumbsProps) => {
           <Fragment key={item.title}>
             {index !== items.length - 1 && (
               <BreadcrumbItem>
-                <BreadcrumbLink href={item.link}>{item.title}</BreadcrumbLink>
+                <BreadcrumbLink asChild>
+                  <Link href={item.link}>{item.title}</Link>
+                </BreadcrumbLink>
               </BreadcrumbItem>
             )}
             {index < items.length - 1 && (

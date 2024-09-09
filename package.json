@@ -35,7 +35,7 @@
     "clsx": "^2.1.1",
     "jose": "^5.7.0",
     "lucide-react": "^0.428.0",
-    "next": "14.2.5",
+    "next": "14.2.9",
     "nextjs-toploader": "^1.6.12",
     "react": "^18",
     "react-dom": "^18",

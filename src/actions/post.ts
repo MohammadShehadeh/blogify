@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
+import type { SessionPayload } from '@/actions/session';
 import { getSession } from '@/actions/session';
 import prisma from '@/db';
 import { createResponse } from '@/lib/utils';
@@ -66,41 +67,33 @@ export const getPostsByAuthorId = async (filter?: 'draft' | 'published') => {
   }
 };
 
-export const getPostById = async (id: string, filter?: 'draft' | 'published') => {
+export const getPostById = async (id: string, session: SessionPayload) => {
   try {
-    const [post, session] = await Promise.all([
-      prisma.post.findUnique({
-        where: {
-          id,
-          ...(!!filter && {
-            status: {
-              in: [filter],
-            },
-          }),
-        },
-        include: {
-          author: {
-            select: {
-              name: true,
-            },
+    const post = await prisma.post.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        author: {
+          select: {
+            name: true,
           },
-          comment: {
-            include: {
-              author: {
-                select: {
-                  name: true,
-                  id: true,
-                },
+        },
+        comment: {
+          include: {
+            author: {
+              select: {
+                name: true,
+                id: true,
               },
             },
-            orderBy: {
-              createdAt: 'desc',
-            },
+          },
+          orderBy: {
+            createdAt: 'desc',
           },
         },
-      }),
-      getSession(),
-    ]);
+      },
+    });
 
     if (post?.status === 'draft' && session?.id !== post.authorId) {
       return createResponse({ post: undefined });

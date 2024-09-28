@@ -4,6 +4,9 @@ import Credentials from 'next-auth/providers/credentials';
 import { retrieveUserByEmail } from '@/actions/auth';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  pages: {
+    signIn: '/login',
+  },
   providers: [
     Credentials({
       // You can specify which fields should be submitted, by adding keys to the `credentials` object.
@@ -19,10 +22,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         });
 
         if ('error' in results.response) {
-          throw new Error('User not found.');
+          return null;
         }
 
-        console.log('results.response.user: ', results.response.user);
         return results.response.user;
       },
     }),
@@ -39,6 +41,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.id = token.id as string;
 
       return session;
+    },
+    authorized({ auth, request: { nextUrl } }) {
+      const isLoggedIn = !!auth?.user;
+      const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
+      const isOnLogin = nextUrl.pathname.startsWith('/login');
+      const isOnRegister = nextUrl.pathname.startsWith('/register');
+
+      if (isOnDashboard) {
+        return isLoggedIn;
+      }
+
+      if (isLoggedIn && (isOnLogin || isOnRegister)) {
+        return Response.redirect(new URL('/dashboard', nextUrl));
+      }
+
+      return true;
     },
   },
 });

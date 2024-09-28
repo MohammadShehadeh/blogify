@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
@@ -10,12 +11,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-// import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import type { LoginFormValues } from '@/types/zod-schema';
 import { loginFormSchema } from '@/types/zod-schema';
 
 export function LoginForm() {
-  // const { toast } = useToast();
+  const { toast } = useToast();
+  const router = useRouter();
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -26,17 +28,24 @@ export function LoginForm() {
 
   const { isSubmitting } = form.formState;
 
-  function onSubmit(values: LoginFormValues) {
-    // const results = await login(values);
-    signIn('credentials', values, { redirectTo: '/dashboard' });
+  async function onSubmit(values: LoginFormValues) {
+    const results = await signIn('credentials', {
+      email: values.email,
+      password: values.password,
+      redirect: false,
+    });
 
-    // if (results && 'error' in results.response) {
-    //   toast({
-    //     title: results.response.title,
-    //     description: results.response.message,
-    //     variant: 'destructive',
-    //   });
-    // }
+    if (results?.error) {
+      toast({
+        title: 'Login Failed!',
+        description: 'Please verify your email and password!',
+        variant: 'destructive',
+      });
+
+      return;
+    }
+
+    router.push('/dashboard');
   }
 
   return (

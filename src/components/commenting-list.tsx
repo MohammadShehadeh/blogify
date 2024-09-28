@@ -1,3 +1,4 @@
+import { useSession } from 'next-auth/react';
 import type { ComponentProps } from 'react';
 import React, { useState } from 'react';
 
@@ -6,12 +7,11 @@ import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { cn, getFormattedDate } from '@/lib/utils';
 import { usePost } from '@/providers/post-provider';
-import { useSession } from '@/providers/session-provider';
 
 export const CommentingList = ({ className }: ComponentProps<'div'>) => {
   const [isPendingId, setIsPendingId] = useState('');
   const { comment: comments, id: postId } = usePost();
-  const session = useSession();
+  const { data: session } = useSession();
 
   if (comments?.length === 0) {
     return (
@@ -28,7 +28,7 @@ export const CommentingList = ({ className }: ComponentProps<'div'>) => {
           key={id}
           className={cn('relative rounded-lg bg-gray-50 px-4 py-5 shadow-sm', { 'opacity-50': isPendingId === id })}
         >
-          {author && session.user?.id === author.id && (
+          {author && session?.user?.id === author.id && (
             <Button
               onClick={() => {
                 setIsPendingId(id);

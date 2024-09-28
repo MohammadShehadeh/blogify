@@ -28,7 +28,7 @@ export const CommentingList = ({ className }: ComponentProps<'div'>) => {
           key={id}
           className={cn('relative rounded-lg bg-gray-50 px-4 py-5 shadow-sm', { 'opacity-50': isPendingId === id })}
         >
-          {author && session.id === author.id && (
+          {author && session.user?.id === author.id && (
             <Button
               onClick={() => {
                 setIsPendingId(id);

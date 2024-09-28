@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-import { getSession } from '@/actions/session';
+import { auth } from '@/auth';
 import { Header } from '@/components/header';
 import { SessionProvider } from '@/providers/session-provider';
 
@@ -9,9 +9,9 @@ export default async function AuthLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getSession();
+  const session = await auth();
 
-  if (session?.id) {
+  if (session?.user?.id) {
     redirect('/dashboard');
   }
 

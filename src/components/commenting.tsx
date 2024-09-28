@@ -20,9 +20,9 @@ export function Commenting() {
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Join The Conversation</SheetTitle>
-          {!session?.id && <SheetDescription>Create a free account to share your thoughts.</SheetDescription>}
+          {!session.user?.id && <SheetDescription>Create a free account to share your thoughts.</SheetDescription>}
         </SheetHeader>
-        {session?.id && <CommentingForm />}
+        {session.user?.id && <CommentingForm />}
         <CommentingList className="mt-4" />
       </SheetContent>
     </Sheet>

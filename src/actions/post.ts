@@ -3,8 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import type { SessionPayload } from '@/actions/session';
-import { getSession } from '@/actions/session';
+import { auth } from '@/auth';
 import prisma from '@/db';
 import { createResponse } from '@/lib/utils';
 import type { PostFormValues } from '@/types/zod-schema';
@@ -40,15 +39,15 @@ export const getPosts = async (filter?: 'draft' | 'published') => {
 
 export const getPostsByAuthorId = async (filter?: 'draft' | 'published') => {
   try {
-    const session = await getSession();
+    const session = await auth();
 
-    if (!session?.id) {
+    if (!session?.user?.id) {
       throw new Error('Unauthorized user');
     }
 
     const posts = await prisma.post.findMany({
       where: {
-        authorId: session.id,
+        authorId: session.user.id,
         ...(!!filter && {
           status: {
             in: [filter],
@@ -67,8 +66,9 @@ export const getPostsByAuthorId = async (filter?: 'draft' | 'published') => {
   }
 };
 
-export const getPostById = async (id: string, session: SessionPayload) => {
+export const getPostById = async (id: string) => {
   try {
+    const session = await auth();
     const post = await prisma.post.findUnique({
       where: {
         id,
@@ -95,7 +95,7 @@ export const getPostById = async (id: string, session: SessionPayload) => {
       },
     });
 
-    if (post?.status === 'draft' && session?.id !== post.authorId) {
+    if (post?.status === 'draft' && session?.user?.id !== post.authorId) {
       return createResponse({ post: undefined });
     }
 
@@ -111,9 +111,9 @@ export const getPostById = async (id: string, session: SessionPayload) => {
 
 export const deletePost = async (id: string, authorId?: string) => {
   try {
-    const session = await getSession();
+    const session = await auth();
 
-    if (!session?.id || session?.id !== authorId) {
+    if (!session?.user?.id || session?.user?.id !== authorId) {
       throw new Error('Unauthorized user');
     }
 
@@ -135,9 +135,9 @@ export const deletePost = async (id: string, authorId?: string) => {
 
 export const updatePost = async ({ id, title, description, imageUrl, content, status, authorId }: PostFormValues) => {
   try {
-    const session = await getSession();
+    const session = await auth();
 
-    if (!session?.id || session?.id !== authorId) {
+    if (!session?.user?.id || session?.user?.id !== authorId) {
       throw new Error('Unauthorized user');
     }
 
@@ -159,9 +159,9 @@ export const updatePost = async ({ id, title, description, imageUrl, content, st
 
 export const createPost = async ({ title, description, imageUrl, content, status }: PostFormValues) => {
   try {
-    const session = await getSession();
+    const session = await auth();
 
-    if (!session?.id) {
+    if (!session?.user?.id) {
       throw new Error('Unauthorized user');
     }
 
@@ -172,7 +172,7 @@ export const createPost = async ({ title, description, imageUrl, content, status
         imageUrl,
         content,
         status,
-        authorId: session?.id as string,
+        authorId: session?.user.id,
       },
     });
   } catch (error) {

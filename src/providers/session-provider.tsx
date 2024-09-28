@@ -2,11 +2,13 @@
 
 import type { PropsWithChildren } from 'react';
 import React, { createContext, useContext } from 'react';
-
 interface Session {
-  email?: string;
-  id?: string;
-  name?: string;
+  user?: {
+    email: string;
+    name: string;
+    id: string;
+  };
+  expires?: Date;
 }
 
 const SessionContext = createContext<Session>({});

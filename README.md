@@ -59,10 +59,10 @@ Create a `.env` file in the root directory and add the following values:
 - The non-pooling connection URL for the PostgreSQL database.
 - Example: POSTGRES_URL_NON_POOLING=`postgres://user:password@host:port/database`
 
-#### `SESSION_SECRET`
+#### `AUTH_SECRET`
 
 - A secret key used for signing session cookies to maintain user sessions.
-- Example: `SESSION_SECRET=your_secure_secret_key`
+- Example: `AUTH_SECRET=your_secure_secret_key`
 
 #### Install dependencies:
 

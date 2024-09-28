@@ -23,7 +23,7 @@ export const Header = () => {
         <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tighter md:text-2xl">
           <Icons.newspaper className="size-6" /> Blogify
         </Link>
-        <div className="flex items-center gap-2">{session?.id ? <NavigationUser /> : <NavigationAuth />}</div>
+        <div className="flex items-center gap-2">{session.user?.id ? <NavigationUser /> : <NavigationAuth />}</div>
       </div>
     </div>
   );

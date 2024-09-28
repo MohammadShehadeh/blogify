@@ -17,7 +17,7 @@ interface EditableIndicatorProps {
 export const EditIndicator = ({ href, postId, className }: EditableIndicatorProps) => {
   const session = useSession();
 
-  if (session.id !== postId) return null;
+  if (session.user?.id !== postId) return null;
 
   return (
     <Button asChild size="icon" variant="link" className={cn('rounded-full bg-muted shadow-lg', className)}>

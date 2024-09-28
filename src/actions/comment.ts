@@ -2,15 +2,15 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { getSession } from '@/actions/session';
+import { auth } from '@/auth';
 import prisma from '@/db';
 import { createResponse } from '@/lib/utils';
 
 export const createComment = async (postId: string, content: string) => {
   try {
-    const session = await getSession();
+    const session = await auth();
 
-    if (!session?.id) {
+    if (!session?.user?.id) {
       throw new Error('Unauthorized user');
     }
 
@@ -18,7 +18,7 @@ export const createComment = async (postId: string, content: string) => {
       data: {
         content,
         postId,
-        authorId: session.id as string,
+        authorId: session.user.id,
       },
     });
   } catch (error) {
@@ -34,9 +34,9 @@ export const createComment = async (postId: string, content: string) => {
 
 export const deleteComment = async (commentId: string, postId: string, authorId: string) => {
   try {
-    const session = await getSession();
+    const session = await auth();
 
-    if (!session?.id || session?.id !== authorId) {
+    if (!session?.user?.id || session?.user?.id !== authorId) {
       throw new Error('Unauthorized user');
     }
 

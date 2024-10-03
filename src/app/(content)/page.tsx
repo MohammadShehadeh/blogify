@@ -1,3 +1,5 @@
+import { unstable_cache } from 'next/cache';
+
 import { getPosts } from '@/actions/post';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { EmptySection } from '@/components/empty-section';
@@ -7,7 +9,8 @@ import { PostsGrid } from '@/components/posts-grid';
 import { Separator } from '@/components/ui/separator';
 
 export default async function HomePage() {
-  const results = await getPosts('published');
+  const getCachedPost = unstable_cache(async () => getPosts('published'), ['posts'], { tags: ['posts'] });
+  const results = await getCachedPost();
   const breadcrumbItems = [{ title: 'Home', link: '/' }];
 
   const posts = 'error' in results.response ? [] : results.response.posts;

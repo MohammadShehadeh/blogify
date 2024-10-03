@@ -1,4 +1,7 @@
+import { unstable_cache } from 'next/cache';
+
 import { getPostsByAuthorId } from '@/actions/post';
+import { auth } from '@/auth';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import {
   Dashboard,
@@ -10,7 +13,13 @@ import {
 import { PostsTable } from '@/components/posts-table';
 
 export default async function DashboardPage() {
-  const results = await getPostsByAuthorId();
+  const session = await auth();
+  const getCachedPost = unstable_cache(
+    async () => getPostsByAuthorId(session),
+    [`posts-by-author:${session?.user?.id}`],
+    { tags: [`posts:${session?.user?.id}`] }
+  );
+  const results = await getCachedPost();
   const breadcrumbItems = [{ title: 'Dashboard', link: '/dashboard' }];
   const posts = 'error' in results.response ? [] : results.response.posts;
 

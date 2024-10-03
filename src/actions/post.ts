@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
 
 import { auth } from '@/auth';
 import prisma from '@/db';
@@ -37,10 +38,8 @@ export const getPosts = async (filter?: 'draft' | 'published') => {
   }
 };
 
-export const getPostsByAuthorId = async (filter?: 'draft' | 'published') => {
+export const getPostsByAuthorId = async (session: Session | null, filter?: 'draft' | 'published') => {
   try {
-    const session = await auth();
-
     if (!session?.user?.id) {
       throw new Error('Unauthorized user');
     }
@@ -66,9 +65,8 @@ export const getPostsByAuthorId = async (filter?: 'draft' | 'published') => {
   }
 };
 
-export const getPostById = async (id: string) => {
+export const getPostById = async (session: Session | null, id: string) => {
   try {
-    const session = await auth();
     const post = await prisma.post.findUnique({
       where: {
         id,

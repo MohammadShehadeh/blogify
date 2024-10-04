@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
@@ -128,6 +128,7 @@ export const deletePost = async (id: string, authorId?: string) => {
     });
   }
 
+  revalidateTag(`posts:${authorId}`);
   revalidatePath('/dashboard');
 };
 
@@ -151,6 +152,7 @@ export const updatePost = async ({ id, title, description, imageUrl, content, st
     });
   }
 
+  revalidateTag(`post:${id}`);
   revalidatePath('/dashboard');
   redirect('/dashboard');
 };
@@ -181,6 +183,7 @@ export const createPost = async ({ title, description, imageUrl, content, status
     });
   }
 
+  revalidateTag('posts');
   revalidatePath('/dashboard');
   redirect('/dashboard');
 };

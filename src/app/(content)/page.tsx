@@ -9,7 +9,7 @@ import { PostsGrid } from '@/components/posts-grid';
 import { Separator } from '@/components/ui/separator';
 
 export default async function HomePage() {
-  const getCachedPost = unstable_cache(async () => getPosts('published'), ['posts'], { tags: ['posts'] });
+  const getCachedPost = unstable_cache(async () => getPosts('published'), ['published-posts'], { tags: ['posts'] });
   const results = await getCachedPost();
   const breadcrumbItems = [{ title: 'Home', link: '/' }];
 

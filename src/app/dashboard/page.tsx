@@ -14,11 +14,13 @@ import { PostsTable } from '@/components/posts-table';
 
 export default async function DashboardPage() {
   const session = await auth();
+
   const getCachedPost = unstable_cache(
     async () => getPostsByAuthorId(session),
-    [`posts-by-author:${session?.user?.id}`],
+    [session?.user?.id as string], // The dashboard page will only be accessible if a user ID is present
     { tags: [`posts:${session?.user?.id}`] }
   );
+
   const results = await getCachedPost();
   const breadcrumbItems = [{ title: 'Dashboard', link: '/dashboard' }];
   const posts = 'error' in results.response ? [] : results.response.posts;

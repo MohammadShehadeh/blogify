@@ -9,7 +9,7 @@ import { PostProvider } from '@/providers/post-provider';
 
 export default async function PostPage({ params }: { params: { slug: string } }) {
   const session = await auth();
-  const getCachedPost = unstable_cache(async () => getPostById(session, params.slug), [params.slug], {
+  const getCachedPost = unstable_cache(async () => getPostById(session, params.slug), [`post:${params.slug}`], {
     tags: [`post:${params.slug}`],
   });
   const results = await getCachedPost();

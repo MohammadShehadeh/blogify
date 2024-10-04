@@ -22,6 +22,7 @@ model Post {
     comment     Comment[]
 
     @@index([authorId])
+    @@index([id])
 }
 
 model User {

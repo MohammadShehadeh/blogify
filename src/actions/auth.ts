@@ -1,6 +1,6 @@
 'use server';
 
-import bcryptjs from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import { redirect } from 'next/navigation';
 
 import prisma from '@/db';
@@ -10,7 +10,7 @@ import type { LoginFormValues, RegisterFormValues } from '@/types/zod-schema';
 export async function createNewUser({ name, email, password }: RegisterFormValues) {
   try {
     // Hash user's password before storing it
-    const hashedPassword = await bcryptjs.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await prisma.user.create({
       data: {
         name,
@@ -52,7 +52,7 @@ export async function retrieveUserByEmail({ email, password }: LoginFormValues) 
     }
 
     const { password: dbPassword, ...restUser } = user;
-    const passwordsMatch = await bcryptjs.compare(password, dbPassword);
+    const passwordsMatch = await bcrypt.compare(password, dbPassword);
 
     if (!passwordsMatch) {
       throw new Error("Passwords don't match");

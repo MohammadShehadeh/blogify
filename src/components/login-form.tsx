@@ -2,9 +2,10 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
-import { login } from '@/actions/auth';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,6 +17,7 @@ import { loginFormSchema } from '@/types/zod-schema';
 
 export function LoginForm() {
   const { toast } = useToast();
+  const router = useRouter();
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -27,15 +29,23 @@ export function LoginForm() {
   const { isSubmitting } = form.formState;
 
   async function onSubmit(values: LoginFormValues) {
-    const results = await login(values);
+    const results = await signIn('credentials', {
+      email: values.email,
+      password: values.password,
+      redirect: false,
+    });
 
-    if (results && 'error' in results.response) {
+    if (results?.error) {
       toast({
-        title: results.response.title,
-        description: results.response.message,
+        title: 'Login Failed!',
+        description: 'Please verify your email and password!',
         variant: 'destructive',
       });
+
+      return;
     }
+
+    router.push('/dashboard');
   }
 
   return (

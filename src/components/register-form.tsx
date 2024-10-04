@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 
-import { signup } from '@/actions/auth';
+import { createNewUser } from '@/actions/auth';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,7 +28,7 @@ export function RegisterForm() {
   const { isSubmitting } = form.formState;
 
   async function onSubmit(values: RegisterFormValues) {
-    const results = await signup(values);
+    const results = await createNewUser(values);
 
     if (results && 'error' in results.response) {
       toast({

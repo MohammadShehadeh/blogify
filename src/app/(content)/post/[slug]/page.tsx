@@ -1,14 +1,18 @@
+import { unstable_cache } from 'next/cache';
 import { notFound } from 'next/navigation';
 
 import { getPostById } from '@/actions/post';
-import { getSession } from '@/actions/session';
+import { auth } from '@/auth';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { PostContent } from '@/components/post-content';
 import { PostProvider } from '@/providers/post-provider';
 
 export default async function PostPage({ params }: { params: { slug: string } }) {
-  const session = await getSession();
-  const results = await getPostById(params.slug, session);
+  const session = await auth();
+  const getCachedPost = unstable_cache(async () => getPostById(session, params.slug), [`post:${params.slug}`], {
+    tags: [`post:${params.slug}`],
+  });
+  const results = await getCachedPost();
   const post = 'error' in results.response ? undefined : results.response.post;
 
   if (!post) {

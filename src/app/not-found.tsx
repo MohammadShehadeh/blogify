@@ -2,13 +2,12 @@ import Link from 'next/link';
 
 import { Header } from '@/components/header';
 import { CenteredContent } from '@/components/layout/centered-content';
-import { SessionLayout } from '@/components/layout/session-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
 export default function NotFound() {
   return (
-    <SessionLayout>
+    <>
       <Header />
       <CenteredContent className="text-center">
         <div className="space-y-2">
@@ -22,6 +21,6 @@ export default function NotFound() {
           </Button>
         </div>
       </CenteredContent>
-    </SessionLayout>
+    </>
   );
 }

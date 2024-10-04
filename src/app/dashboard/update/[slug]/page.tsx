@@ -1,14 +1,14 @@
 import { notFound } from 'next/navigation';
 
 import { getPostById } from '@/actions/post';
-import { getSession } from '@/actions/session';
+import { auth } from '@/auth';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Dashboard, DashboardDescription, DashboardHeader, DashboardTitle } from '@/components/dashboard-header';
 import { PostForm } from '@/components/post-form';
 
 export default async function UpdatePage({ params }: { params: { slug: string } }) {
-  const session = await getSession();
-  const results = await getPostById(params.slug, session);
+  const session = await auth();
+  const results = await getPostById(session, params.slug);
 
   const breadcrumbItems = [
     { title: 'Dashboard', link: '/dashboard/' },

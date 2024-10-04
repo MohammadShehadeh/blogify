@@ -6,7 +6,8 @@ export const env = createEnv({
     NODE_ENV: z.string().min(1),
     POSTGRES_PRISMA_URL: z.string().min(1),
     POSTGRES_URL_NON_POOLING: z.string().min(1),
-    SESSION_SECRET: z.string().min(1),
+    AUTH_SECRET: z.string().min(1),
+    AUTH_TRUST_HOST: z.string().min(1),
   },
   client: {
     NEXT_PUBLIC_VERCEL_URL: z.string().min(1),

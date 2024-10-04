@@ -1,14 +1,15 @@
 'use client';
 
+import { useSession } from 'next-auth/react';
+
 import { CommentingForm } from '@/components/commenting-form';
 import { CommentingList } from '@/components/commenting-list';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { useSession } from '@/providers/session-provider';
 
 export function Commenting() {
-  const session = useSession();
+  const { data: session } = useSession();
 
   return (
     <Sheet>
@@ -20,9 +21,9 @@ export function Commenting() {
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Join The Conversation</SheetTitle>
-          {!session?.id && <SheetDescription>Create a free account to share your thoughts.</SheetDescription>}
+          {!session?.user?.id && <SheetDescription>Create a free account to share your thoughts.</SheetDescription>}
         </SheetHeader>
-        {session?.id && <CommentingForm />}
+        {session?.user?.id && <CommentingForm />}
         <CommentingList className="mt-4" />
       </SheetContent>
     </Sheet>

@@ -25,6 +25,11 @@ const nextConfig = {
       },
     ],
   },
+  webpack: (config) => {
+    // https://github.com/kelektiv/node.bcrypt.js/issues/874#issuecomment-833582766
+    config.externals = [...config.externals, 'bcrypt'];
+    return config;
+  },
 };
 
 export default withMDX(nextConfig);

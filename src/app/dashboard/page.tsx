@@ -1,6 +1,6 @@
 import { unstable_cache } from 'next/cache';
 
-import { getPostsByAuthorId } from '@/actions/post';
+import { getPostsByUserId } from '@/actions/post';
 import { auth } from '@/auth';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import {
@@ -16,7 +16,7 @@ export default async function DashboardPage() {
   const session = await auth();
 
   const getCachedPost = unstable_cache(
-    async () => getPostsByAuthorId(session),
+    async () => getPostsByUserId(session),
     [session?.user?.id as string], // The dashboard page will only be accessible if a user ID is present
     { tags: [`posts:${session?.user?.id}`] }
   );

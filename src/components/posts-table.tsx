@@ -44,7 +44,7 @@ const postColumns: Column<Post>[] = [
     className: 'text-right',
     cell: (post) => (
       <TableRowAction
-        onDelete={() => deletePost(post.id, post.authorId)}
+        onDelete={() => deletePost(post.id, post.userId)}
         updateLink={`/dashboard/update/${post.id}`}
         viewLink={`/post/${post.id}`}
       />

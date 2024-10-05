@@ -27,7 +27,7 @@ export function PostForm({
   description = '',
   imageUrl = '',
   content = '',
-  authorId,
+  userId,
 }: Partial<PostFormValues & { action: 'create' | 'update' }>) {
   const { toast } = useToast();
   const form = useForm<PostFormValues>({
@@ -45,7 +45,7 @@ export function PostForm({
 
   async function onSubmit(values: PostFormValues) {
     const actionCallback = action === 'update' ? updatePost : createPost;
-    const results = await actionCallback({ ...values, id, authorId });
+    const results = await actionCallback({ ...values, id, userId });
 
     if (results && 'error' in results.response) {
       toast({

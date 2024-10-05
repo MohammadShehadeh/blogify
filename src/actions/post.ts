@@ -1,34 +1,31 @@
 'use server';
 
+import { eq } from 'drizzle-orm';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { Session } from 'next-auth';
 
 import { auth } from '@/auth';
-import prisma from '@/db';
+import { db } from '@/db';
+import { posts } from '@/db/schema';
 import { createResponse } from '@/lib/utils';
 import type { PostFormValues } from '@/types/zod-schema';
 
-export const getPosts = async (filter?: 'draft' | 'published') => {
+export const getPosts = async (filter: 'draft' | 'published' = 'published') => {
   try {
-    const posts = await prisma.post.findMany({
-      include: {
-        author: {
-          select: {
+    const filteredPosts = await db.query.posts.findMany({
+      where: (posts, { eq }) => eq(posts.status, filter),
+      with: {
+        user: {
+          columns: {
+            id: true,
             name: true,
           },
         },
       },
-      ...(!!filter && {
-        where: {
-          status: {
-            in: [filter],
-          },
-        },
-      }),
     });
 
-    return createResponse({ posts });
+    return createResponse({ posts: filteredPosts });
   } catch (error) {
     return createResponse({
       error: true,
@@ -38,24 +35,19 @@ export const getPosts = async (filter?: 'draft' | 'published') => {
   }
 };
 
-export const getPostsByAuthorId = async (session: Session | null, filter?: 'draft' | 'published') => {
+export const getPostsByUserId = async (session: Session | null) => {
   try {
     if (!session?.user?.id) {
       throw new Error('Unauthorized user');
     }
 
-    const posts = await prisma.post.findMany({
-      where: {
-        authorId: session.user.id,
-        ...(!!filter && {
-          status: {
-            in: [filter],
-          },
-        }),
-      },
+    const userId = session.user.id;
+
+    const postsByUserId = await db.query.posts.findMany({
+      where: (posts, { eq }) => eq(posts.userId, userId),
     });
 
-    return createResponse({ posts });
+    return createResponse({ posts: postsByUserId });
   } catch (error) {
     return createResponse({
       error: true,
@@ -67,33 +59,29 @@ export const getPostsByAuthorId = async (session: Session | null, filter?: 'draf
 
 export const getPostById = async (session: Session | null, id: string) => {
   try {
-    const post = await prisma.post.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        author: {
-          select: {
-            name: true,
-          },
-        },
-        comment: {
-          include: {
-            author: {
-              select: {
+    const post = await db.query.posts.findFirst({
+      where: (posts, { eq }) => eq(posts.id, id),
+      with: {
+        comments: {
+          with: {
+            user: {
+              columns: {
                 name: true,
                 id: true,
               },
             },
           },
-          orderBy: {
-            createdAt: 'desc',
+        },
+        user: {
+          columns: {
+            name: true,
+            id: true,
           },
         },
       },
     });
 
-    if (post?.status === 'draft' && session?.user?.id !== post.authorId) {
+    if (post?.status === 'draft' && session?.user?.id !== post.userId) {
       return createResponse({ post: undefined });
     }
 
@@ -107,19 +95,15 @@ export const getPostById = async (session: Session | null, id: string) => {
   }
 };
 
-export const deletePost = async (id: string, authorId?: string) => {
+export const deletePost = async (id: string, userId?: string) => {
   try {
     const session = await auth();
 
-    if (!session?.user?.id || session?.user?.id !== authorId) {
+    if (!session?.user?.id || session?.user?.id !== userId) {
       throw new Error('Unauthorized user');
     }
 
-    await prisma.post.delete({
-      where: {
-        id,
-      },
-    });
+    await db.delete(posts).where(eq(posts.id, id));
   } catch (error) {
     return createResponse({
       error: true,
@@ -128,22 +112,30 @@ export const deletePost = async (id: string, authorId?: string) => {
     });
   }
 
-  revalidateTag(`posts:${authorId}`);
+  revalidateTag(`posts`);
+  revalidateTag(`posts:${userId}`);
   revalidatePath('/dashboard');
 };
 
-export const updatePost = async ({ id, title, description, imageUrl, content, status, authorId }: PostFormValues) => {
+export const updatePost = async ({ id, title, description, imageUrl, content, status, userId }: PostFormValues) => {
   try {
     const session = await auth();
+    const sessionUserId = session?.user?.id;
 
-    if (!session?.user?.id || session?.user?.id !== authorId) {
+    if (!id || !sessionUserId || userId !== sessionUserId) {
       throw new Error('Unauthorized user');
     }
 
-    await prisma.post.update({
-      where: { id },
-      data: { title, description, imageUrl, content, status },
-    });
+    await db
+      .update(posts)
+      .set({
+        title,
+        description,
+        imageUrl,
+        content,
+        status,
+      })
+      .where(eq(posts.id, id));
   } catch (error) {
     return createResponse({
       error: true,
@@ -152,6 +144,7 @@ export const updatePost = async ({ id, title, description, imageUrl, content, st
     });
   }
 
+  revalidateTag(`posts`);
   revalidateTag(`post:${id}`);
   revalidatePath('/dashboard');
   redirect('/dashboard');
@@ -165,16 +158,18 @@ export const createPost = async ({ title, description, imageUrl, content, status
       throw new Error('Unauthorized user');
     }
 
-    await prisma.post.create({
-      data: {
-        title,
-        description,
-        imageUrl,
-        content,
-        status,
-        authorId: session?.user.id,
-      },
+    const userId = session.user.id;
+
+    await db.insert(posts).values({
+      title,
+      description,
+      imageUrl,
+      content,
+      status,
+      userId: userId,
     });
+
+    revalidateTag(`posts:${userId}`);
   } catch (error) {
     return createResponse({
       error: true,

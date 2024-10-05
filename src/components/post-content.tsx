@@ -22,18 +22,18 @@ const Commenting = dynamic(() => import('@/components/commenting').then((mod) =>
 });
 
 export const PostContent = () => {
-  const { title, description, author, authorId, imageUrl, id, createdAt, content } = usePost();
+  const { title, description, user, userId, imageUrl, id, createdAt, content } = usePost();
 
   return (
     <section>
       <div className="mb-4 flex flex-col">
         <h1 className="mb-2 mt-4 text-4xl capitalize">{title}</h1>
         <p className="text-lg">{description}</p>
-        <Byline authorName={author ? author.name : ''} />
+        <Byline authorName={user?.name ?? ''} />
 
         <div className="relative my-4">
           <LazyImage width={1042} height={384} className="h-[384px] rounded-t-md" src={imageUrl} alt={title} />
-          <EditIndicator href={`/dashboard/update/${id}`} postId={authorId} className="absolute right-4 top-4 z-10" />
+          <EditIndicator href={`/dashboard/update/${id}`} postId={userId} className="absolute right-4 top-4 z-10" />
         </div>
 
         <div className="flex items-center justify-between gap-2">

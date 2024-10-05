@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
+import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
 import { createNewUser } from '@/actions/auth';
@@ -36,7 +37,15 @@ export function RegisterForm() {
         description: results.response.message,
         variant: 'destructive',
       });
+
+      return;
     }
+
+    await signIn('credentials', {
+      email: values.email,
+      password: values.password,
+      redirect: true,
+    });
   }
 
   return (

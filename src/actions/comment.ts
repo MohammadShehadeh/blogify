@@ -1,9 +1,11 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { eq } from 'drizzle-orm';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 import { auth } from '@/auth';
-import prisma from '@/db';
+import { db } from '@/db';
+import { comments } from '@/db/schema';
 import { createResponse } from '@/lib/utils';
 
 export const createComment = async (postId: string, content: string) => {
@@ -14,12 +16,12 @@ export const createComment = async (postId: string, content: string) => {
       throw new Error('Unauthorized user');
     }
 
-    await prisma.comment.create({
-      data: {
-        content,
-        postId,
-        authorId: session.user.id,
-      },
+    const userId = session.user.id;
+
+    await db.insert(comments).values({
+      content,
+      postId,
+      userId,
     });
   } catch (error) {
     return createResponse({
@@ -29,22 +31,19 @@ export const createComment = async (postId: string, content: string) => {
     });
   }
 
+  revalidateTag(`post:${postId}`);
   revalidatePath(`/posts/${postId}`);
 };
 
-export const deleteComment = async (commentId: string, postId: string, authorId: string) => {
+export const deleteComment = async (commentId: string, postId: string, userId: string) => {
   try {
     const session = await auth();
 
-    if (!session?.user?.id || session?.user?.id !== authorId) {
+    if (!session?.user?.id || session?.user?.id !== userId) {
       throw new Error('Unauthorized user');
     }
 
-    await prisma.comment.delete({
-      where: {
-        id: commentId,
-      },
-    });
+    await db.delete(comments).where(eq(comments.id, commentId));
   } catch (error) {
     return createResponse({
       error: true,
@@ -53,24 +52,20 @@ export const deleteComment = async (commentId: string, postId: string, authorId:
     });
   }
 
+  revalidateTag(`post:${postId}`);
   revalidatePath(`/posts/${postId}`);
 };
 
 export const getCommentsByPostId = async (postId: string) => {
   try {
-    const comments = await prisma.comment.findMany({
-      where: {
-        postId,
-      },
-      include: {
-        author: {
-          select: {
+    const comments = await db.query.comments.findMany({
+      where: (comments, { eq }) => eq(comments.id, postId),
+      with: {
+        user: {
+          columns: {
             name: true,
           },
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
       },
     });
 

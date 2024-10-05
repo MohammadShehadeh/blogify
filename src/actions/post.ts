@@ -112,6 +112,7 @@ export const deletePost = async (id: string, userId?: string) => {
     });
   }
 
+  revalidateTag(`posts`);
   revalidateTag(`posts:${userId}`);
   revalidatePath('/dashboard');
 };
@@ -143,6 +144,7 @@ export const updatePost = async ({ id, title, description, imageUrl, content, st
     });
   }
 
+  revalidateTag(`posts`);
   revalidateTag(`post:${id}`);
   revalidatePath('/dashboard');
   redirect('/dashboard');

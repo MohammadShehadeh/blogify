@@ -41,11 +41,11 @@ export function RegisterForm() {
       return;
     }
 
-    await signIn("credentials", {
+    await signIn('credentials', {
       email: values.email,
       password: values.password,
       redirect: true,
-    })
+    });
   }
 
   return (

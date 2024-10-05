@@ -7,7 +7,7 @@ export default defineConfig({
   out: './migrations',
   dialect: 'postgresql',
   dbCredentials: {
-    url: env.POSTGRES_PRISMA_URL!,
+    url: env.POSTGRES_PRISMA_URL,
   },
   // Print all statements
   verbose: true,

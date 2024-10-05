@@ -9,22 +9,23 @@ export interface Post {
   description: string;
   content: string;
   imageUrl: string;
-  authorId: string | null;
+  userId: string | null;
   createdAt: number | Date | null;
-  author: {
+  user: {
     name: string;
+    id: string;
   } | null;
-  comment: Comment[] | null;
+  comments: Comment[];
 }
 
 export interface Comment {
   id: string;
   content: string;
   createdAt: number | Date | null;
-  author: {
+  user: {
     name: string;
     id: string;
-  } | null;
+  };
 }
 
 const PostContext = createContext<Post | undefined>(undefined);

@@ -10,7 +10,7 @@ import { usePost } from '@/providers/post-provider';
 
 export const CommentingList = ({ className }: ComponentProps<'div'>) => {
   const [isPendingId, setIsPendingId] = useState('');
-  const { comment: comments, id: postId } = usePost();
+  const { comments, id: postId } = usePost();
   const { data: session } = useSession();
 
   if (comments?.length === 0) {
@@ -23,16 +23,16 @@ export const CommentingList = ({ className }: ComponentProps<'div'>) => {
 
   return (
     <div className={cn('space-y-4', className)}>
-      {comments?.map(({ id, author, createdAt, content }) => (
+      {comments?.map(({ id, user, createdAt, content }) => (
         <div
           key={id}
           className={cn('relative rounded-lg bg-gray-50 px-4 py-5 shadow-sm', { 'opacity-50': isPendingId === id })}
         >
-          {author && session?.user?.id === author.id && (
+          {user && session?.user?.id === user.id && (
             <Button
               onClick={() => {
                 setIsPendingId(id);
-                deleteComment(id, postId, author.id);
+                deleteComment(id, postId, user.id);
               }}
               className="absolute right-2 top-2 size-4 rounded-sm text-black opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               size="icon"
@@ -44,7 +44,7 @@ export const CommentingList = ({ className }: ComponentProps<'div'>) => {
           )}
 
           <div className="mb-2 text-sm text-gray-600">
-            <p className="font-semibold">{author?.name}</p>
+            <p className="font-semibold">{user?.name}</p>
             <p className="text-sm text-gray-500">commented on {getFormattedDate(createdAt)}</p>
           </div>
           <p className="break-words text-gray-800">{content}</p>

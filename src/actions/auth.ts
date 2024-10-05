@@ -1,9 +1,9 @@
 'use server';
 
 import bcrypt from 'bcrypt';
-import { redirect } from 'next/navigation';
 
-import prisma from '@/db';
+import { db } from '@/db';
+import { users } from '@/db/schema';
 import { createResponse } from '@/lib/utils';
 import type { LoginFormValues, RegisterFormValues } from '@/types/zod-schema';
 
@@ -11,25 +11,20 @@ export async function createNewUser({ name, email, password }: RegisterFormValue
   try {
     // Hash user's password before storing it
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await prisma.user.create({
-      data: {
+    const newUser = await db
+      .insert(users)
+      .values({
         name,
         email,
         password: hashedPassword,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        password: false,
-      },
-    });
+      })
+      .returning({ insertedId: users.id });
 
-    if (!newUser.id) {
+    if (!newUser) {
       throw new Error('something went wrong while creating new user');
     }
 
-    redirect('/login');
+    return createResponse({ data: newUser });
   } catch (error) {
     return createResponse({
       error: true,
@@ -41,10 +36,8 @@ export async function createNewUser({ name, email, password }: RegisterFormValue
 
 export async function retrieveUserByEmail({ email, password }: LoginFormValues) {
   try {
-    const user = await prisma.user.findUnique({
-      where: {
-        email,
-      },
+    const user = await db.query.users.findFirst({
+      where: (users, { eq }) => eq(users.email, email),
     });
 
     if (!user) {

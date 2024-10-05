@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const postFormSchema = z.object({
   id: z.string().optional(),
-  authorId: z.string().optional(),
+  userId: z.string().optional(),
   title: z.string().min(5).max(220),
   status: z.enum(['draft', 'published']),
   description: z.string().min(10).max(400),

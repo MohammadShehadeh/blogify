@@ -15,7 +15,7 @@ export interface Post {
     name: string;
     id: string;
   } | null;
-  comments: Comment[];
+  comments?: Comment[];
 }
 
 export interface Comment {

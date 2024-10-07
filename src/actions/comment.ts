@@ -32,6 +32,7 @@ export const createComment = async (postId: string, content: string) => {
   }
 
   revalidateTag(`post:${postId}`);
+  revalidateTag(`comments:${postId}`);
   revalidatePath(`/posts/${postId}`);
 };
 
@@ -53,17 +54,19 @@ export const deleteComment = async (commentId: string, postId: string, userId: s
   }
 
   revalidateTag(`post:${postId}`);
+  revalidateTag(`comments:${postId}`);
   revalidatePath(`/posts/${postId}`);
 };
 
 export const getCommentsByPostId = async (postId: string) => {
   try {
     const comments = await db.query.comments.findMany({
-      where: (comments, { eq }) => eq(comments.id, postId),
+      where: (comments, { eq }) => eq(comments.postId, postId),
       with: {
         user: {
           columns: {
             name: true,
+            id: true,
           },
         },
       },

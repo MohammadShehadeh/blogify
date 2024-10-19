@@ -1,5 +1,7 @@
 'use server';
 
+import 'use-server';
+
 import { eq } from 'drizzle-orm';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';

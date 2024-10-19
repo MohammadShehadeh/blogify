@@ -1,5 +1,7 @@
 'use server';
 
+import 'use-server';
+
 import bcrypt from 'bcrypt';
 
 import { db } from '@/db';

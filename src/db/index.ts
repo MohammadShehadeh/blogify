@@ -1,17 +1,11 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
-// import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
 
 import * as schema from '@/db/schema';
 import { env } from '@/env';
 
 const drizzleClientSingleton = () => {
-  //   // for migrations
-  //   const migrationClient = postgres(env.POSTGRES_PRISMA_URL || '', { max: 1 });
-  //   migrate(drizzle(migrationClient), { migrationsFolder: 'migrations' });
-
-  // for query purposes
-  const queryClient = postgres(env.POSTGRES_PRISMA_URL || '');
+  const queryClient = postgres(env.DATABASE_URL || '');
   return drizzle(queryClient, { schema });
 };
 

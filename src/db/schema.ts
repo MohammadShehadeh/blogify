@@ -12,9 +12,9 @@ export const users = pgTable(
     email: text('email').notNull(),
     password: text('password').notNull(),
   },
-  (table) => ({
-    emailUniqueIndex: uniqueIndex('emailUniqueIndex').on(lower(table.email)),
-  })
+  (table) => ([
+    uniqueIndex('emailUniqueIndex').on(lower(table.email)),
+  ])
 );
 
 export const posts = pgTable(
@@ -32,9 +32,9 @@ export const posts = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
   },
-  (table) => ({
-    userIdIndex: index('userIdIndex').on(table.userId),
-  })
+  (table) => [
+    index('userIdIndex').on(table.userId),
+  ]
 );
 
 export const comments = pgTable(
@@ -50,9 +50,7 @@ export const comments = pgTable(
       .notNull()
       .references(() => posts.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
   },
-  (table) => ({
-    postIdIndex: index('postIdIndex').on(table.postId),
-  })
+  (table) => [index('postIdIndex').on(table.postId)]
 );
 
 export const postsRelations = relations(posts, ({ one, many }) => ({

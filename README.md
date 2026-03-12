@@ -49,10 +49,10 @@ Create a `.env` file in the root directory and add the following values:
 - The base URL for the Vercel deployment of your application.
 - Example: `NEXT_PUBLIC_VERCEL_URL=https://your-vercel-app.vercel.app`
 
-#### `POSTGRES_PRISMA_URL`
+#### `DATABASE_URL`
 
 - The Prisma connection URL for the PostgreSQL database.
-- Example: POSTGRES_PRISMA_URL=postgres://user:password@host:port/database
+- Example: DATABASE_URL=postgres://user:password@host:port/database
 
 #### `POSTGRES_URL_NON_POOLING`
 
